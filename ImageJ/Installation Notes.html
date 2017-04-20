@@ -1,0 +1,219 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>OS X Installation</title>
+</head>
+<body>
+
+<h1>OS X Installation</h1>
+
+<blockquote>
+
+<ul>
+<li><a href="#install">Installation</a>
+<li><a href="#memory">Memory</a>
+<li><a href="#upgrade">Upgrading</a>
+<li><a href="#dandd">Drag and Drop</a>
+<li><a href="#bugs">Known Problems</a>
+<li><a href="#jars">Adding JAR Files</a>
+<li><a href="#cli">Running from the Command Line</a>
+<li><a href="#icon">About the Icon</a>
+</ul>
+
+<a name=install></a>
+<h3>Installation</h3>
+Download ImageJ for Mac OS X from the
+<a href="http://rsb.info.nih.gov/ij/download.html">Download</a> page. The ZIP file you download
+(Image1.xx.zip) should automatically expand to a folder named "ImageJ".
+Copy this folder to the Applications folder, open it, and copy <i>ImageJ.app</i> 
+to the dock. A 32-bit version of ImageJ (<i>ImageJ32.app</i>), needed for running QuickTime plugins,
+is also available, but it is unabe to use more than 1800MB of memory.
+<p>
+<a name=unidentified></a>
+<b>With OS X 10.7 or later</b>, the first time you run ImageJ, you may 
+get get an "ImageJ can't be opened because it is from an unidentified developer" message,
+which can usually be bypassed by right clicking on ImageJ.app and selecting "Open"
+from the drop down menu. if that doesn't work, open the "Security & Privacy"   
+panel in System Preferences and change "Allow apps downloaded
+from:" to "Anywhere". You can switch back to the original setting
+once ImageJ is running.
+<p>
+<a name=quicktime></a>
+<b>OS X 10.10 (Yosemite) and later</b> do not include key files required for running commands
+like <i>File&gt;Import&gt;Using QuickTime</i> and <i>File&gt;Save As&gt;QuickTime Movie</i>
+that use QuickTime for Java. You can work around this problem by copying the files QTJava.zip
+and libQTJNative.jnilib, available at
+<a href="http://imagej.nih.gov/ij/download/qt/">imagej.nih.gov/ij/download/qt/</a>
+into ~/Library/Java/Extensions, where "~" is your home directory.
+Yosemite hides the Library folder by default, so you will need to open your home folder
+and check "Show Library Folder" in the <i>View&gt;Show View Options</i> dialog.
+Before copying the files, you will need to create the ~/Library/Java and ~/Library/Java/Extensions folders.
+<p>
+<a name=randomization></a>
+<b>macOS 10.12 (Sierra)</b> introduces a security feature called  
+<a href="https://weblog.rogueamoeba.com/2016/06/29/sierra-and-gatekeeper-path-randomization/">
+Path Randomization</a>
+that can cause ImageJ to not work as expected.
+Path randomization is in effect if the “ImageJ home” path shown in the <i>Image&gt;Show Info</i> window starts
+with “/private” and plugins are not installed in the Plugins menu. You can disable path randomization by moving
+ImageJ.app out of the ImageJ folder and then copying it back. If the ImageJ folder is in /Applications you will
+need to hold down the alt key while dragging ImageJ.app out of the ImageJ folder. 
+
+<a name=memory></a>
+<h3>Memory</h3>
+Use the 
+<a href="http://rsb.info.nih.gov/ij/docs/menus/edit.html#memory"><i>Edit&gt;Options&gt;Memory & Threads</i></a>
+command to make more than default 3000MB of memory available to ImageJ.
+Note that setting the "Maximum Memory" value to more than about 75% of real RAM
+may result in poor perfomance due to virtual memory "thrashing". 
+The maximum amount of memory that can be allocated on 32-bit systems is about 1.8GB.
+Another way to make more memory available to ImageJ is 
+by running from the command line and using the -Xmx option.
+
+<p>
+The <i>Edit&gt;Options&gt;Memory</i> command updates the VMOptions key in the Contents/Info.plist XML file
+in the ImageJ.app bundle.
+
+<blockquote><pre>
+    &lt;key&gt;VMOptions&lt;/key&gt;
+    &lt;string&gt;-Xms256m -Xmx3000m&lt;/string&gt;
+</pre></blockquote>
+
+You will get an error message if you do not have write permission for the ImageJ application.
+To check and/or change the permissions, open the ImageJ folder, select the ImageJ application, and use
+the Finder's <i>File&gt;Get Info</i> command.
+
+<a name=upgrade></a>
+<h3>Upgrading</h3>
+Use the <i>Help&gt;Update ImageJ</i> command to upgrade to the latest version of ImageJ. 
+This command may fail with a “Release Notes are not in the expected format” error if you are
+running a version of ImageJ earlier than 1.50i.
+You can work around this problem by using the
+<a href="https://imagej.nih.gov/ij/plugins/updater/index.html">ImageJ Updater</a> plugin
+to upgrade.
+
+<a name=dandd></a>
+<h3>Drag and Drop</h3>
+The OS X version of ImageJ opens images, text files, ROIs and LUTs that are dropped on
+the ImageJ icon or on the "ImageJ" window. Drag and drop TIFF files on the <i>&gt;&gt;</i> icon
+in the toolbar to open them as virtual stacks.
+
+<a name=bugs></a>
+<h3>Known Problems</h3>
+<ol>
+
+	<li> The first time you run ImageJ you may get a
+   <a href="#unidentified">
+	<i>"ImageJ can't be opened because it is from an unidentified developer"</i></a>
+	message.
+
+	<li> Plugins may not be installed when running macOS 10.12 (Sierra) due to
+   <a href="#randomization"><i>Gateway Path Randomization</i></a>.
+
+    <li> Commands (e.g. <i>File&gt;Import&gt;Video</i>) and plugins that use QuickTime
+    for Java fail with 64-bit versions of Java and with
+    <a href="#quicktime"> OS X 10.10 (Yosemite) and later</a>
+  .	
+    <li> Using command-v to paste text into the file name field of Save As dialog boxes does not work.
+	This is a bug in the Java FileDialog class that can worked around by
+	right-clicking in the name field and selecting "Paste" from the drop down menu.
+
+</ol>
+
+</blockquote>
+
+<a name=jars></a>
+<h3>Adding JAR Files</h3>
+Some plugins require a Java code library contained in a JAR file
+(e.g., <a href="http://math.nist.gov/javanumerics/jama/">Jama.jar</a>). ImageJ's plugin class loader automatically
+loads code from such libraries as long as the JAR file is in the plugins folder or an immediate subfolder.
+The <i>Plugins&gt;Compile and Run</i> command also supports JAR file libraries 
+located in the plugins folder or a subfolder. Note that <i>Compile and Run</i> will not recognize the JAR file if the name does
+not end in ".jar" or if the name contains an underscore.
+<p>
+
+<a name=cli></a>
+<h3>Running from the Command Line</h3>
+To run ImageJ from the command line, open a Terminal window, cd to the ImageJ directory, then use 
+the java command to run ImageJ.  The easiest way to do this is to drag the ImageJ folder to the Terminal Window, 
+type return, then type: 
+
+<blockquote><pre>
+java -jar -Xmx1024m ImageJ.app/Contents/Resources/Java/ij.jar
+</pre></blockquote>
+
+or, with the version bundled with Java 8, type:
+
+<blockquote><pre>
+java -jar -Xmx1024m ImageJ.app/Resources/Java/ij.jar
+</pre></blockquote>
+
+The -Xmx1024m switch specifies that ImageJ will have available a maximum of 1024MB (1GB) of RAM.
+<p>
+Use a command like this to run ImageJ from any directory:
+
+<blockquote><pre>
+java -Xmx1024m -jar /Applications/ImageJ/ImageJ.app/Contents/Resources/Java/ij.jar -ijpath /Applications/ImageJ
+</pre></blockquote>
+
+ImageJ recognizes the following command line options:
+<pre>
+  "file-name"
+     Opens a file
+     Example 1: blobs.tif
+     Example 2: /Users/wayne/images/blobs.tif
+     Example 3: e81*.tif
+
+  -macro path [arg]
+     Runs a macro or script (JavaScript, BeanShell or Python), passing an
+     optional string argument, which the macro or script can be retrieve
+     using the getArgument() function. The macro or script is assumed to 
+     be in the ImageJ/macros folder if 'path' is not a full directory path.
+     Example 1: -macro analyze.ijm
+     Example 2: -macro script.js /Users/wayne/images/stack1
+     Example 2: -macro script.py '1.2 2.4 3.8'
+
+  -batch path [arg]
+    Runs a macro or script (JavaScript, BeanShell or Python) in
+    batch (no GUI) mode, passing it an optional argument.
+    ImageJ exits when the macro finishes.
+
+  -eval "macro code"
+     Evaluates macro code
+     Example 1: -eval "print('Hello, world');"
+     Example 2: -eval "return getVersion();"
+
+  -run command
+     Runs an ImageJ menu command
+     Example: -run "About ImageJ..."
+     
+  -ijpath path
+     Specifies the path to the directory containing the plugins directory
+     Example: -ijpath /Applications/ImageJ
+
+  -port<n>
+     Specifies the port ImageJ uses to determine if another instance is running
+     Example 1: -port1 (use default port address + 1)
+     Example 2: -port2 (use default port address + 2)
+     Example 3: -port0 (don't check for another instance)
+
+  -debug
+     Runs ImageJ in debug mode
+</pre>
+<p>
+
+<a name=icon></a>
+<h3>About the Icon</h3>
+The ImageJ icon for OS X is based on a photograph by 
+<a href="http://www.tomgrill.com/">Tom Grill</a>
+of a <br>
+Hartnack microscope, circa 1870's, at 
+<a href="http://www.arsmachina.com/s-hart1209.htm">www.arsmachina.com</a>. A full size PNG version
+of the icon is available at
+<a href="http://rsb.info.nih.gov/ij/images/ImageJ.png">rsb.info.nih.gov/ij/images/ImageJ.png</a>.
+<p>
+
+</blockquote>
+
+</body>
+</html>
