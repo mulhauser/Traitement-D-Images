@@ -5,7 +5,7 @@ import ij.plugin.filter.PlugInFilter;    // pour interface PlugInFilter
 import ij.process.*;                    // pour classe ImageProcessor
 import ij.gui.*;                        // pour classe GenericDialog et Newimage
 
-public class Filtre_Moyenneur implements PlugInFilter {
+public class Filtre_Median implements PlugInFilter {
 
     public int setup(String arg, ImagePlus imp) {
 
@@ -16,7 +16,7 @@ public class Filtre_Moyenneur implements PlugInFilter {
         int w = ip.getWidth();
         int h = ip.getHeight();
         byte[] pixels = (byte[]) ip.getPixels();
-        ImagePlus result = NewImage.createByteImage(" Filtrage Moyenneur", w, h, 1, NewImage.FILL_BLACK);
+        ImagePlus result = NewImage.createByteImage(" Filtrage Median", w, h, 1, NewImage.FILL_BLACK);
         ImageProcessor ipr = result.getProcessor();
         byte[] pixelsr = (byte[]) ipr.getPixels();
 
@@ -57,55 +57,26 @@ public class Filtre_Moyenneur implements PlugInFilter {
             }
         }
 
+        int cptr = 0;
         for (int y = n; y < w - n; y++) {
             for (int x = n; x < h - n; x++) {
-                //A COMPLETER
-
-				/*
-                1/9(I(i-1,j-1)+I(i,j-1)+I(i+1,j-1)
-				+I(i-1,j)+I(i,j)+I(i+1,j)
-				+I(i-1,j+1)+I(i,j+1)+I(i+1,j+1))
-				*/
-                //pixelsr [x+y*w] = () ;
-
-                // Il faut recopier la valeur de l'image initiale sur les bords
-                // Fonctionne avec la methode brute
-                /*if(y == n){
-					// coin
-					if(x == n) ipr.putPixel(y-n,x-n,ip.getPixel(y-n,x-n));
-					else if(x == h-n-1) ipr.putPixel(y-n,x+n,ip.getPixel(y-n,x+n));
-					// cote gauche
-					ipr.putPixel(y-n,x,ip.getPixel(y-n,x));					
-				}else if(y == w-n-1){
-					// coin
-					if(x == n) ipr.putPixel(y+n,x-n,ip.getPixel(y+n,x-n));
-					else if(x == h-n-1) ipr.putPixel(y+n,x+n,ip.getPixel(y+n,x+n));		
-					// cote droit
-					ipr.putPixel(y+n,x,ip.getPixel(y+n,x));					
-				}
-
-				if(x == n){
-
-					ipr.putPixel(y,x-n,ip.getPixel(y,x-n));					
-				}else if(x == h-n-1){
-					ipr.putPixel(y,x+n,ip.getPixel(y,x+n));					
-				}*/
-
-                // Methode brute
-				/*int pixMoy = (ip.getPixel(y-1,x-1)+ip.getPixel(y,x-1)+ip.getPixel(y+1,x-1)
-							+ip.getPixel(y-1,x)+ip.getPixel(y,x)+ip.getPixel(y+1,x)
-							+ip.getPixel(y-1,x+1)+ip.getPixel(y,x+1)+ip.getPixel(y+1,x+1))/9;*/
 
 
                 int pixMoy = 0;
                 int normalisation = 0;
+                int k = 0;
+                int[] a = new int[masque.length*masque.length];
                 for (int i = 0; i < masque.length; i++) {
                     for (int j = 0; j < masque[i].length; j++) {
-                        normalisation += masque[i][j];
-                        pixMoy += ip.getPixel(y - n + i, x - n + j);
+
+                        a[k] = ip.getPixel(y - n + i, x - n + j);
+                        //int k = i+j;
+                        //if(cptr < 2) IJ.log(k+" : "+a[i+(i*j)]);
+                        k++;
                     }
                 }
-                pixMoy = pixMoy / normalisation;
+                cptr++;
+                pixMoy = mediane(a);
 
                 ipr.putPixel(y, x, pixMoy);
             }
@@ -114,4 +85,19 @@ public class Filtre_Moyenneur implements PlugInFilter {
         result.show();
         result.updateAndDraw();
     }
+
+    static int mediane(int a[]) {
+        int[] effectifs = new int[256]; // tableau des effectifs
+        for (int i = 0; i < a.length; i++) {
+            effectifs[a[i]]++;
+        }
+        int somme = 0;
+        for (int i = 0; i <= 255; i++) {
+            somme = somme + effectifs[i];
+            if (2 * somme >= a.length) return i;
+        }
+        return -1;
+    }
+
+
 }
