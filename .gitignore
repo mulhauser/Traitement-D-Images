@@ -13,3 +13,4 @@ hs_err_pid*
 
 ImageJ/plugins/.idea/
 ImageJ/plugins/plugins.iml
+ImageJ/plugins/out/
