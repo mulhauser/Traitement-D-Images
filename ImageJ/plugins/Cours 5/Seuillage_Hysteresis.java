@@ -7,7 +7,7 @@ import ij.gui.*;
 
 import java.lang.Math;                        // pour classe GenericDialog et Newimage
 
-public class Norme_Gradient_Seuil implements PlugInFilter {
+public class Seuillage_Hysteresis implements PlugInFilter {
 
     public int setup(String arg, ImagePlus imp) {
 
@@ -18,7 +18,7 @@ public class Norme_Gradient_Seuil implements PlugInFilter {
         int w = ip.getWidth();
         int h = ip.getHeight();
         byte[] pixels = (byte[]) ip.getPixels();
-        ImagePlus result = NewImage.createByteImage("Norme Gradient Seuil", w, h, 1, NewImage.FILL_BLACK);
+        ImagePlus result = NewImage.createByteImage("Seuillage Hysteresis", w, h, 1, NewImage.FILL_BLACK);
         ImageProcessor ipr = result.getProcessor();
 
 
@@ -47,38 +47,41 @@ public class Norme_Gradient_Seuil implements PlugInFilter {
         // Recopie des bords
         // Gauche
         for (int y = 0; y < n; y++) {
-            for (int x = 0; x < w; x++) {
+            for (int x = 0; x < h; x++) {
                 ipr.putPixel(x, y, ip.getPixel(x, y));
             }
         }
         // Droit
-        for (int y = h - n; y < h; y++) {
-            for (int x = 0; x < w; x++) {
+        for (int y = w - n; y < w; y++) {
+            for (int x = 0; x < h; x++) {
                 ipr.putPixel(x, y, ip.getPixel(x, y));
             }
         }
         // Haut
-        for (int y = 0; y < h; y++) {
+        for (int y = 0; y < w; y++) {
             for (int x = 0; x < n; x++) {
                 ipr.putPixel(x, y, ip.getPixel(x, y));
             }
         }
         // Bas
-        for (int y = 0; y < h; y++) {
-            for (int x = w - n; x < h; x++) {
+        for (int y = 0; y < w; y++) {
+            for (int x = h - n; x < h; x++) {
                 ipr.putPixel(x, y, ip.getPixel(x, y));
             }
         }
 
-        int[][] pixMoyTab = new int[w][h];
-        int min = Integer.MAX_VALUE;
-        int max = Integer.MIN_VALUE;
+        double Sh = 30;
+        double Sb = 150; // On essaie avec 0.4
+
+        double[][] pixMoyTab = new double[w][h];
+        boolean[][] pixContourTab = new boolean[w][h];
+        //int[][] pixDirTab = new int[w][h];
         for (int y = n; y < w - n; y++) {
             for (int x = n; x < h - n; x++) {
 
 
-                int pixMoySx = 0;
-                int pixMoySy = 0;
+                double pixMoySx = 0;
+                double pixMoySy = 0;
                 for (int i = 0; i < masqueSx.length; i++) {
                     for (int j = 0; j < masqueSx[i].length; j++) {
                         pixMoySx += ip.getPixel(y - n + i, x - n + j) * masqueSx[i][j];
@@ -86,18 +89,45 @@ public class Norme_Gradient_Seuil implements PlugInFilter {
                     }
                 }
 
-                //if (pixMoySx < 25) pixMoySx = 0;
-                //else if (pixMoySx < 0) pixMoySx = 0;
 
-                //if (pixMoySy < 25) pixMoySy = 0;
-                //else if (pixMoySy < 0) pixMoySy = 0;
+                double pixMoy = Math.sqrt((pixMoySx * pixMoySx) + (pixMoySy * pixMoySy));
+
+                pixMoyTab[y][x] = pixMoy;
+                if(pixMoy < Sb){
+                    pixContourTab[y][x] = false;
+                }else if(pixMoy > Sh){
+                    pixContourTab[y][x] = true;
+                }else{
+                    if(pixContourTab[y][x-1]) pixContourTab[y][x] = true; // on test a gauche
+                    else if(pixContourTab[y-1][x-1]) pixContourTab[y][x] = true; // on test en haut a gauche
+                    else if(pixContourTab[y-1][x]) pixContourTab[y][x] = true; // on en haut
+                    else pixContourTab[y][x] = false;
+                }
 
 
-                int pixMoy = (int) Math.sqrt((pixMoySx * pixMoySx) + (pixMoySy * pixMoySy));
-                if(pixMoy > 50) pixMoy = 255;
-                else pixMoy = 0;
+            }
+        }
 
-                ipr.putPixel(y, x, pixMoy);
+        for (int y = n; y < w - n; y++) {
+            for (int x = n; x < h - n; x++) {
+                if(pixContourTab[y][x]) ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
+                else if(pixMoyTab[y][x] > Sb && pixMoyTab[y][x] < Sh){
+                    if (pixContourTab[y][x - 1]) {
+                        pixContourTab[y][x] = true; // on test a gauche
+                        ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
+                    } else if (pixContourTab[y - 1][x - 1]) {
+                        pixContourTab[y][x] = true; // on test en haut a gauche
+                        ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
+                    } else if (pixContourTab[y - 1][x]) {
+                        pixContourTab[y][x] = true; // on en haut
+                        ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
+                    } else {
+                        pixContourTab[y][x] = false;
+                        ipr.putPixel(y, x, 0);
+                    }
+                }else{
+                    ipr.putPixel(y, x, 0);
+                }
             }
         }
 

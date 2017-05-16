@@ -16,10 +16,10 @@ public class Masque_Sobel implements PlugInFilter {
         int w = ip.getWidth();
         int h = ip.getHeight();
         byte[] pixels = (byte[]) ip.getPixels();
-        ImagePlus resultSx = NewImage.createByteImage(" Masque Sobel Sx", w, h, 1, NewImage.FILL_BLACK);
+        ImagePlus resultSx = NewImage.createByteImage("Masque Sobel Sx", w, h, 1, NewImage.FILL_BLACK);
         ImageProcessor iprSx = resultSx.getProcessor();
 
-        ImagePlus resultSy = NewImage.createByteImage(" Masque Sobel Sy", w, h, 1, NewImage.FILL_BLACK);
+        ImagePlus resultSy = NewImage.createByteImage("Masque Sobel Sy", w, h, 1, NewImage.FILL_BLACK);
         ImageProcessor iprSy = resultSy.getProcessor();
 
         // pas utilisé

@@ -18,7 +18,7 @@ public class Supp_Maxima implements PlugInFilter {
         int w = ip.getWidth();
         int h = ip.getHeight();
         byte[] pixels = (byte[]) ip.getPixels();
-        ImagePlus result = NewImage.createByteImage(" Norme Gradient Seuil", w, h, 1, NewImage.FILL_BLACK);
+        ImagePlus result = NewImage.createByteImage("Suppression non Maxima", w, h, 1, NewImage.FILL_BLACK);
         ImageProcessor ipr = result.getProcessor();
 
 
@@ -96,84 +96,38 @@ public class Supp_Maxima implements PlugInFilter {
 
                 if(Double.isNaN(dir)) dir = 0.0;
 
-                // Partie droite
-                if (pixMoySx >= 0) {
-                    if (pixMoySy >= 0) {
-                        // Partie Haute
-                        // Regarde entre 90 et 45
-                        // Partie 90
-                        if (dir > (45 + 45 / 2)) {
-                            pixDirTab[y][x] = 90;
-                            // Partie 45
-                        } else {
-                            pixDirTab[y][x] = 45;
-                        }
-                        // Regarde entre 45 et 0
-                        // Partie 45
-                        if (dir > 45 / 2) {
-                            pixDirTab[y][x] = 45;
-                            // Partie 0
-                        } else {
-                            pixDirTab[y][x] = 0;
-                        }
-                    } else {
-                        // Partie Basse
-                        // Regarde entre 90 et 45
-                        // Partie 90
-                        if (dir > (45 + 45 / 2)) {
-                            pixDirTab[y][x] = 270;
-                            // Partie 45
-                        } else {
-                            pixDirTab[y][x] = 315;
-                        }
-                        // Regarde entre 45 et 0
-                        // Partie 45
-                        if (dir > 45 / 2) {
-                            pixDirTab[y][x] = 315;
-                            // Partie 0
-                        } else {
-                            pixDirTab[y][x] = 0;
-                        }
-                    }
-                } else {
-                    // Partie Gauche
-                    if (pixMoySy >= 0) {
-                        // Partie Haute
-                        // Regarde entre 90 et 45
-                        // Partie 90
-                        if (dir > (45 + 45 / 2)) {
-                            pixDirTab[y][x] = 90;
-                            // Partie 45
-                        } else {
-                            pixDirTab[y][x] = 135;
-                        }
-                        // Regarde entre 45 et 0
-                        // Partie 45
-                        if (dir > 45 / 2) {
-                            pixDirTab[y][x] = 135;
-                            // Partie 0
-                        } else {
-                            pixDirTab[y][x] = 180;
-                        }
-                    } else {
-                        // Partie Basse
-                        // Regarde entre 90 et 45
-                        // Partie 90
-                        if (dir > (45 + 45 / 2)) {
-                            pixDirTab[y][x] = 270;
-                            // Partie 45
-                        } else {
-                            pixDirTab[y][x] = 225;
-                        }
-                        // Regarde entre 45 et 0
-                        // Partie 45
-                        if (dir > 45 / 2) {
-                            pixDirTab[y][x] = 225;
-                            // Partie 0
-                        } else {
-                            pixDirTab[y][x] = 180;
-                        }
-                    }
+                if (dir > 45 / 2) { // entre 0 et 45
+                    pixDirTab[y][x] = 45; // 45 degre
+                } else if (dir >= 0){
+                    pixDirTab[y][x] = 0; // 0 degre
+                } else if (dir > (45 + 45 / 2)) { // entre 45 et 90
+                    pixDirTab[y][x] = 90; // 90 degre
+                } else if (dir >= 45){
+                    pixDirTab[y][x] = 45; // 45 degree
+                } else if (dir > (90 + 45 / 2)) { // entre 90 et 135
+                    pixDirTab[y][x] = 135; // 135 degre
+                } else if (dir >= 90){
+                    pixDirTab[y][x] = 90; // 90 degre
+                } else if (dir > 135 + 45 / 2) { // entre 135 et 180
+                    pixDirTab[y][x] = 180; // 180 degre
+                } else if (dir >= 135){
+                    pixDirTab[y][x] = 135; // 135 degre
+                } else if (dir > 180 + 45 / 2) { // Entre 180 et 225
+                    pixDirTab[y][x] = 225; // 225 degre
+                } else if (dir >= 180){
+                    pixDirTab[y][x] = 180; // 180 degre
+                } else if (dir > (225 + 45 / 2)) { // entre 225 et 270
+                    pixDirTab[y][x] = 270;
+                } else if (dir >= 225){
+                    pixDirTab[y][x] = 225;
+                } else if (dir > (270 + 45 / 2)) { // entre 270 et 315
+                    pixDirTab[y][x] = 315; // 315 degre
+                } else if (dir >= 270){
+                    pixDirTab[y][x] = 270; // 270 degre
+                } else if (dir > 315 + 45 / 2) { // entre 315 et 0
+                    pixDirTab[y][x] = 0; // 0 degre
+                } else if (dir >= 315){
+                    pixDirTab[y][x] = 315; // 315 degre
                 }
 
                 double pixMoy = Math.sqrt((pixMoySx * pixMoySx) + (pixMoySy * pixMoySy));
@@ -187,36 +141,36 @@ public class Supp_Maxima implements PlugInFilter {
             for (int x = n; x < h - n; x++) {
                 if (pixDirTab[y][x] == 0) {
                     if (pixMoyTab[y][x - 1] > pixMoyTab[y][x] || pixMoyTab[y][x + 1] > pixMoyTab[y][x])
-                        ipr.putPixel(x, y, 0);
-                    else ipr.putPixel(x, y, (int) pixMoyTab[y][x]);
+                        ipr.putPixel(y, x, 0);
+                    else ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
                 } else if (pixDirTab[y][x] == 45) {
                     if (pixMoyTab[y - 1][x - 1] > pixMoyTab[y][x] || pixMoyTab[y + 1][x + 1] > pixMoyTab[y][x])
-                        ipr.putPixel(x, y, 0);
-                    else ipr.putPixel(x, y, (int) pixMoyTab[y][x]);
+                        ipr.putPixel(y, x, 0);
+                    else ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
                 } else if (pixDirTab[y][x] == 90) {
                     if (pixMoyTab[y - 1][x] > pixMoyTab[y][x] || pixMoyTab[y + 1][x] > pixMoyTab[y][x])
-                        ipr.putPixel(x, y, 0);
-                    else ipr.putPixel(x, y, (int) pixMoyTab[y][x]);
+                        ipr.putPixel(y, x, 0);
+                    else ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
                 } else if (pixDirTab[y][x] == 135) {
                     if (pixMoyTab[y - 1][x + 1] > pixMoyTab[y + 1][x - 1] || pixMoyTab[y][x + 1] > pixMoyTab[y][x])
-                        ipr.putPixel(x, y, 0);
-                    else ipr.putPixel(x, y, (int) pixMoyTab[y][x]);
+                        ipr.putPixel(y, x, 0);
+                    else ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
                 } else if (pixDirTab[y][x] == 180) {
                     if (pixMoyTab[y][x + 1] > pixMoyTab[y][x] || pixMoyTab[y][x - 1] > pixMoyTab[y][x])
-                        ipr.putPixel(x, y, 0);
-                    else ipr.putPixel(x, y, (int) pixMoyTab[y][x]);
+                        ipr.putPixel(y, x, 0);
+                    else ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
                 } else if (pixDirTab[y][x] == 225) {
                     if (pixMoyTab[y + 1][x + 1] > pixMoyTab[y][x] || pixMoyTab[y - 1][x - 1] > pixMoyTab[y][x])
-                        ipr.putPixel(x, y, 0);
-                    else ipr.putPixel(x, y, (int) pixMoyTab[y][x]);
+                        ipr.putPixel(y, x, 0);
+                    else ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
                 } else if (pixDirTab[y][x] == 270) {
                     if (pixMoyTab[y + 1][x] > pixMoyTab[y][x] || pixMoyTab[y - 1][x] > pixMoyTab[y][x])
-                        ipr.putPixel(x, y, 0);
-                    else ipr.putPixel(x, y, (int) pixMoyTab[y][x]);
+                        ipr.putPixel(y, x, 0);
+                    else ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
                 } else if (pixDirTab[y][x] == 315) {
                     if (pixMoyTab[y + 1][x - 1] > pixMoyTab[y][x] || pixMoyTab[y - 1][x + 1] > pixMoyTab[y][x])
-                        ipr.putPixel(x, y, 0);
-                    else ipr.putPixel(x, y, (int) pixMoyTab[y][x]);
+                        ipr.putPixel(y, x, 0);
+                    else ipr.putPixel(y, x, (int) pixMoyTab[y][x]);
                 }
             }
         }

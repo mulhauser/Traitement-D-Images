@@ -18,7 +18,7 @@ public class Norme_Gradient implements PlugInFilter {
         int w = ip.getWidth();
         int h = ip.getHeight();
         byte[] pixels = (byte[]) ip.getPixels();
-        ImagePlus result = NewImage.createByteImage(" Norme Gradient", w, h, 1, NewImage.FILL_BLACK);
+        ImagePlus result = NewImage.createByteImage("Norme Gradient", w, h, 1, NewImage.FILL_BLACK);
         ImageProcessor ipr = result.getProcessor();
 
 
